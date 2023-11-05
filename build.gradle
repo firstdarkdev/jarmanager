@@ -1,0 +1,96 @@
+plugins {
+    id 'java'
+    id 'com.github.johnrengelman.shadow' version '7.0.0'
+    id "com.diffplug.spotless" version "6.13.0"
+}
+apply plugin: 'maven-publish'
+
+var base_version = "${version_major}.${version_minor}.${version_patch}"
+
+group = maven_group
+version = base_version
+archivesBaseName = "JarManager"
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
+
+configurations {
+    shadeMe
+    implementation.extendsFrom shadeMe
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compileOnly "org.projectlombok:lombok:${lombok}"
+    annotationProcessor "org.projectlombok:lombok:${lombok}"
+
+    testCompileOnly "org.projectlombok:lombok:${lombok}"
+    testAnnotationProcessor "org.projectlombok:lombok:${lombok}"
+
+    shadeMe("me.lucko:jar-relocator:${jarrelocator}") {
+        exclude group: 'org.ow2.asm'
+    }
+
+    shadeMe "org.ow2.asm:asm:${asm}"
+    shadeMe "org.ow2.asm:asm-commons:${asm}"
+}
+
+shadowJar {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    configurations = [project.configurations.getByName("shadeMe")]
+    archiveClassifier.set(null)
+}
+
+spotless {
+    java {
+        targetExclude("src/test/**")
+        licenseHeaderFile(rootProject.file("HEADER")).yearSeparator("-")
+    }
+}
+
+jar {
+    manifest {
+        attributes([
+                'Timestamp'               : System.currentTimeMillis(),
+                'Specification-Title'     : project.archivesBaseName,
+                'Specification-Version'   : project.version,
+                'Implementation-Title'    : project.archivesBaseName,
+                'Implementation-Version'  : project.version,
+                'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
+                'Built-On-Java'           : "${System.getProperty('java.vm.version')} (${System.getProperty('java.vm.vendor')})"
+        ])
+    }
+}
+
+tasks.register('sourcesJar', Jar) {
+    from sourceSets.main.allSource
+    setArchiveClassifier("sources");
+}
+
+tasks.register('javadocJar', Jar) {
+    dependsOn 'javadoc'
+    from javadoc.destinationDir
+    setArchiveClassifier("javadoc");
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifact shadowJar
+            artifact sourcesJar
+            artifact javadocJar
+        }
+    }
+
+    repositories {
+        maven {
+            url System.getenv('MAVEN_URL')
+            credentials {
+                username System.getenv('MAVEN_USER')
+                password System.getenv('MAVEN_PASS')
+            }
+        }
+    }
+}
