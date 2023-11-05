@@ -5,13 +5,18 @@ plugins {
 }
 apply plugin: 'maven-publish'
 
-var base_version = "${version_major}.${version_minor}.${version_patch}"
+var base_version = "${version_major}.${version_minor}"
+var final_version = "${base_version}.${version_patch}"
 
 group = maven_group
-version = base_version
+version = final_version
 archivesBaseName = "JarManager"
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
+
+if (System.getenv('BUILD_NUMBER') != null) {
+    version = "${base_version}." + (System.getenv('BUILD_NUMBER') - 1)
+}
 
 configurations {
     shadeMe
