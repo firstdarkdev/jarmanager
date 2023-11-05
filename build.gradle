@@ -15,7 +15,8 @@ sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 
 if (System.getenv('BUILD_NUMBER') != null) {
-    version = "${base_version}." + (System.getenv('BUILD_NUMBER') - 1)
+    var build = (System.getenv('BUILD_NUMBER').toInteger() - 1)
+    version = "${base_version}.${build}"
 }
 
 configurations {
