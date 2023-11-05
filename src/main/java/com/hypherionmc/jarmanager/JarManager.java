@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import me.lucko.jarrelocator.JarRelocator;
+import me.lucko.jarrelocator.Relocation;
 
 import java.io.File;
 import java.io.IOException;
@@ -71,6 +72,26 @@ public final class JarManager {
      * @throws IOException - Thrown when an IO error occurs
      */
     public void remapJar(File inputJar, File outputJar, HashMap<String, String> relocations) throws IOException {
+        // Set up temp file, to prevent accidental overwrites
+        File tempJar = new File(inputJar.getParentFile(), "tempRelocated.jar");
+
+        // Run the jar relocater task
+        JarRelocator relocator = new JarRelocator(inputJar, tempJar, relocations);
+        relocator.run();
+
+        // Move the temporary file to the outputJar
+        Files.move(tempJar.toPath(), outputJar.toPath(), StandardCopyOption.REPLACE_EXISTING);
+    }
+
+    /**
+     * Relocate or remap packages inside a jar file.
+     * For example, from com.google.gson to lib.com.google.gson
+     * @param inputJar - The input jar file that will be modified
+     * @param outputJar - The file the modified file will be saved to
+     * @param relocations - Packages to relocate. See example above
+     * @throws IOException - Thrown when an IO error occurs
+     */
+    public void remapJar(File inputJar, File outputJar, List<Relocation> relocations) throws IOException {
         // Set up temp file, to prevent accidental overwrites
         File tempJar = new File(inputJar.getParentFile(), "tempRelocated.jar");
 
