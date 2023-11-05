@@ -4,11 +4,11 @@
  */
 package com.hypherionmc.jarmanager;
 
+import com.hypherionmc.jarrelocator.JarRelocator;
+import com.hypherionmc.jarrelocator.Relocation;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import me.lucko.jarrelocator.JarRelocator;
-import me.lucko.jarrelocator.Relocation;
 
 import java.io.File;
 import java.io.IOException;
@@ -101,5 +101,23 @@ public final class JarManager {
 
         // Move the temporary file to the outputJar
         Files.move(tempJar.toPath(), outputJar.toPath(), StandardCopyOption.REPLACE_EXISTING);
+    }
+
+    /**
+     * Relocate or remap packages inside a directory.
+     * For example, from com.google.gson to lib.com.google.gson
+     * The directory will be packed into a jar after remapping is done
+     * @param inputDirectory - The input directory containing the jar content
+     * @param outputJar - The remapped and packed output jar
+     * @param relocations - Packages to relocate. See example above
+     * @throws IOException - Thrown when an IO error occurs
+     */
+    public void remapAndPack(File inputDirectory, File outputJar, List<Relocation> relocations) throws IOException {
+
+        // Run the jar relocater task
+        JarRelocator relocator = new JarRelocator(inputDirectory, outputJar, relocations);
+        relocator.runDirectory();
+
+        packJar(inputDirectory, outputJar);
     }
 }
