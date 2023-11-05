@@ -99,5 +99,5 @@ JarManager is licensed under the MIT License.
 
 JarManager includes the following embedded libraries:
 
-* [jar-relocator](https://github.com/lucko/jar-relocator) - Licensed under [Apache-2.0 License](https://github.com/lucko/jar-relocator/blob/master/LICENSE.txt)
+* [jar-relocator](https://github.com/firstdarkdev/jar-relocator) A fork of the original with additional features - Licensed under [Apache-2.0 License](https://github.com/lucko/jar-relocator/blob/master/LICENSE.txt)
 * [OW2 ASM](https://gitlab.ow2.org/asm/asm) - Licensed under [BSD 3-Clause License](https://gitlab.ow2.org/asm/asm/-/blob/master/LICENSE.txt?ref_type=heads)

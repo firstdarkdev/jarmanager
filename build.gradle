@@ -26,6 +26,9 @@ configurations {
 
 repositories {
     mavenCentral()
+    maven {
+        url "https://maven.firstdark.dev/releases"
+    }
 }
 
 dependencies {
@@ -35,7 +38,7 @@ dependencies {
     testCompileOnly "org.projectlombok:lombok:${lombok}"
     testAnnotationProcessor "org.projectlombok:lombok:${lombok}"
 
-    shadeMe("me.lucko:jar-relocator:${jarrelocator}") {
+    shadeMe("com.hypherionmc:jar-relocator:${jarrelocator}") {
         exclude group: 'org.ow2.asm'
     }
 
